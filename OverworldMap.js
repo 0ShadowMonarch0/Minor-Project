@@ -12,7 +12,7 @@ class OverworldMap {
     this.enemies = [];
     this.enemySpawnTimer = null;
     this.enemySpawnInterval = 3000; // spawn every 3 seconds
-    this.maxEnemies = 3; // limit to 15 enemies at a time
+    this.maxEnemies = config.maxEnemies || 3; // limit to 15 enemies at a time 🔴 Changed here
     this.enemiesDefeated = 0; // New variable
     this.portal = null; // New variable to reference portal
   }
@@ -73,7 +73,11 @@ class OverworldMap {
   startEnemySpawning(lvl) {
     console.log("Starting enemy spawning for level:", lvl); // Debugging
     this.enemySpawnTimer = setInterval(() => {
-      if (this.enemies.length < this.maxEnemies && !this.isCutscenePlaying) {
+      if (
+        this.enemies.length < this.maxEnemies &&
+        !this.isCutscenePlaying &&
+        this.enemiesDefeated < this.maxEnemies
+      ) {
         this.spawnEnemy(lvl);
       }
     }, this.enemySpawnInterval);
@@ -124,6 +128,7 @@ class OverworldMap {
       src: enemyConfig.src,
       speed: enemyConfig.speed, //Slower Speed
       maxHealth: enemyConfig.maxHealth,
+      frameSize: enemyConfig.frameSize,
     });
 
     enemy.id = `enemy_${Date.now()}`;
@@ -139,11 +144,11 @@ class OverworldMap {
   }
 
   //Winning condition i.e. defeating required enemies
-  didWin() {
-    return this.enemiesDefeated >= this.maxEnemies;
-  }
+  // didWin() {
+  //   return this.enemiesDefeated >= this.maxEnemies;
+  // }
   checkWinCondition() {
-    if (this.didWin() && !this.portal) {
+    if (this.enemiesDefeated >= this.maxEnemies && !this.portal) {
       this.stopEnemySpawning();
       this.spawnPortal();
     }
@@ -221,6 +226,7 @@ window.OverworldMaps = {
     mapId: "lvl1",
     lowersrc: "/images/final_level1.png",
     uppersrc: "/images/layer_1.png",
+    maxEnemies: 5,
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
@@ -283,6 +289,7 @@ window.OverworldMaps = {
     mapId: "lvl2",
     lowersrc: "/images/sprite-0004.png",
     uppersrc: "/images/level0004-1.png",
+    maxEnemies: 5,
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
@@ -344,6 +351,7 @@ window.OverworldMaps = {
     mapId: "lvl3",
     lowersrc: "/images/level3_.png",
     uppersrc: "/images/level3_1.png",
+    maxEnemies: 2,
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,

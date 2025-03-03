@@ -18,6 +18,7 @@ class Person extends GameObject {
     this.maxStamina = config.maxStamina || 100;
     this.stamina = this.maxStamina;
     this.staminaRegenRate = config.staminaRegenRate || 0.5; // Stamina Regen Per Step
+    this.enemyDamageCooldowns = {}; // Store individual enemy cooldowns
   }
 
   recoverStamina() {
@@ -50,6 +51,7 @@ class Person extends GameObject {
       this.updateSprite(state);
     }
     this.handleAttack(state);
+    this.checkEnemyCollisions(state);
   }
 
   handleAttack(state) {
@@ -65,7 +67,7 @@ class Person extends GameObject {
         );
         if (distance <= attackRange) {
           console.log("Enemy hit!", enemy);
-          enemy.takeDamage(10);
+          enemy.takeDamage(10 , state);
           this.pushBackEnemy(enemy, attackDirection, state.map);
         }
       });
@@ -73,7 +75,7 @@ class Person extends GameObject {
   }
 
   pushBackEnemy(enemy, direction, map) {
-    const pushbackDistance = 16; // Adjust as needed
+    const pushbackDistance = 100; // Adjust as needed
     const [property, change] = enemy.directionUpdate[direction];
 
     // Calculate the new enemy position
@@ -107,6 +109,45 @@ class Person extends GameObject {
       // Apply the pushback
       enemy[property] += change;
       enemy.movingProgressRemaining = pushbackDistance / enemy.speed;
+    }
+  }
+
+  checkEnemyCollisions(state) {
+    state.map.enemies.forEach((enemy) => {
+      const distance = Math.sqrt(
+        Math.pow(this.x - enemy.x, 2) + Math.pow(this.y - enemy.y, 2)
+      );
+      if (distance < 16) {
+        // Check if the enemy has a cooldown active
+        if (!this.enemyDamageCooldowns[enemy.id]) {
+          // No cooldown, so take damage and start the cooldown
+          this.takeDamage(10 , state);
+          enemy.stopMovingForDuration(5000);
+          this.enemyDamageCooldowns[enemy.id] = true; // Start cooldown
+          setTimeout(() => {
+            // Reset cooldown after 5 seconds
+            delete this.enemyDamageCooldowns[enemy.id];
+          }, 5000);
+        }
+      }
+    });
+  }
+
+  takeDamage(damageAmount, state) {
+    this.health -= damageAmount;
+    console.log(
+      "Hero taking damage:",
+      damageAmount,
+      "Current health:",
+      this.health
+    );
+    if (this.health <= 0) {
+      this.health = 0;
+
+      // Handle death/game over scenario here
+      state.overworld.stopGameLoop(); // Stop game loop via overworld instance
+      state.overworld.showGameOverScreen(); // Show game over screen
+      console.log("Game Over!");
     }
   }
 
@@ -156,7 +197,6 @@ class Person extends GameObject {
   }
 
   updateSprite() {
-
     if (this.movingProgressRemaining > 0) {
       this.sprite.setAnimation("walk-" + this.direction);
       return;

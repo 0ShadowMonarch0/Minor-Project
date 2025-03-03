@@ -8,6 +8,7 @@ class GameObject {
     this.sprite = new Sprite({
       gameObject: this,
       src: config.src || "/images/character.png",
+      frameSize: config.frameSize,
     });
 
     this.behaviourLoop = config.behaviourLoop || {};

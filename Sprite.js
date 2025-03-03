@@ -11,6 +11,8 @@ class Sprite {
       this.isloaded = true;
     };
 
+    this.frameSize = config.frameSize || { x: 32, y: 32 };
+
     //shadow
     this.shadow = new Image();
     this.useShadow = true; //config.useShadow || false
@@ -103,7 +105,17 @@ class Sprite {
     const [frameX, frameY] = this.frame;
 
     this.isloaded &&
-      ctx.drawImage(this.image, frameX * 32, frameY * 32, 32, 32, x, y, 32, 32); //cutting the sprite and drawing on the map
+      ctx.drawImage(
+        this.image,
+        frameX * this.frameSize.x, // x coordinate on spritesheet
+        frameY * this.frameSize.y, // y coordinate on spritesheet
+        this.frameSize.x, // width of frame
+        this.frameSize.y, // height of frame
+        x,
+        y,
+        this.frameSize.x,
+        this.frameSize.y
+      ); //cutting the sprite and drawing on the map
     this.updateAnimationProgress();
 
     if (this.gameObject instanceof Enemy) {

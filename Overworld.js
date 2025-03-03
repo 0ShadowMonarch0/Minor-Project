@@ -47,11 +47,13 @@ class Overworld {
         object.update({
           arrow: this.directionInput.direction,
           map: this.map,
+          overworld: this,
         });
       });
       this.map.enemies.forEach((object) => {
         object.update({
           map: this.map,
+          overworld: this,
         });
       });
 
@@ -239,6 +241,16 @@ class Overworld {
       { who: "hero", type: "walk", direction: "down" },
       { who: "hero", type: "walk", direction: "down" },
     ]);
+  }
+
+  stopGameLoop() {
+    this.gameLoopActive = false; // Set the flag to stop the game loop
+    cancelAnimationFrame(this.animationFrameId); // Cancel the animation frame
+  }
+
+  showGameOverScreen() {
+    const gameOverScreen = document.querySelector(".game-over-screen");
+    gameOverScreen.classList.add("active");
   }
 
   init() {

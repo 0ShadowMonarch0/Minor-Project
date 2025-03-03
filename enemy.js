@@ -20,6 +20,8 @@ class Enemy extends GameObject {
     this.behaviourLoop = config.behaviourLoop || []; //  add a default loop
     this.maxHealth = config.maxHealth || 100;
     this.health = this.maxHealth;
+    this.isMovingStopped = false;
+    this.stopMovingTimeout = null;
 
     this.startRandomDirection();
     console.log("Enemy created with config:", config);
@@ -62,6 +64,18 @@ class Enemy extends GameObject {
     });
   }
 
+  stopMovingForDuration(duration) {
+    this.isMovingStopped = true;
+    this.stopRandomDirection(); // Stop random direction changes
+    if (this.stopMovingTimeout) {
+      clearTimeout(this.stopMovingTimeout);
+    }
+    this.stopMovingTimeout = setTimeout(() => {
+      this.isMovingStopped = false;
+      this.startRandomDirection(); // Resume random direction changes
+    }, duration);
+  }
+
   randomDirection() {
     const directions = ["up", "down", "left", "right"];
     const randomIndex = Math.floor(Math.random() * directions.length);
@@ -99,6 +113,9 @@ class Enemy extends GameObject {
         this.isChasing = false;
         setTimeout(() => this.startRandomDirection(), 1000); // 🔴 Fix: Delay before returning to random movement
       }
+    }
+    if (this.isMovingStopped) {
+      return; // If movement is stopped, do nothing
     }
 
     if (this.movingProgressRemaining > 0) {
