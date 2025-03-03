@@ -44,6 +44,13 @@ class GameObject {
 
     //Setting up our event with relevent info
     let eventConfig = this.behaviourLoop[this.behaviourLoopIndex];
+
+    //Check if we have config to do something
+    if (!eventConfig) {
+      //Check here if config exists
+      return;
+    }
+
     eventConfig.who = this.id;
 
     //Create an event instance of our next event config

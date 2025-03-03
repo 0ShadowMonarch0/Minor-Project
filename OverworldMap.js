@@ -68,14 +68,13 @@ class OverworldMap {
         this.checkWinCondition();
       }
     });
-    this.startEnemySpawning();
   }
 
-  startEnemySpawning(level) {
-    console.log("Starting enemy spawning for level:", level); // Debugging
+  startEnemySpawning(lvl) {
+    console.log("Starting enemy spawning for level:", lvl); // Debugging
     this.enemySpawnTimer = setInterval(() => {
       if (this.enemies.length < this.maxEnemies && !this.isCutscenePlaying) {
-        this.spawnEnemy(level);
+        this.spawnEnemy(lvl);
       }
     }, this.enemySpawnInterval);
   }
@@ -91,6 +90,7 @@ class OverworldMap {
   }
 
   spawnEnemy(level) {
+    console.log("Spawning enemy for level:", level); // Debugging
     if (this.enemies.length >= this.maxEnemies) {
       return; // Prevent spawning more than maxEnemies
     }
@@ -115,7 +115,8 @@ class OverworldMap {
     } while (this.isSpaceTaken(x, y));
 
     // Get enemy configuration based on the level
-    const enemyConfig = EnemyTypes[level] || EnemyTypes.level1; // Default to level1 if level is not found
+    const enemyConfig = EnemyTypes[level] || EnemyTypes.lvl1; // Default to level1 if level is not found
+    console.log("Enemy config:", enemyConfig); // Debugging
 
     const enemy = new Enemy({
       x: x,
@@ -153,7 +154,7 @@ class OverworldMap {
     this.portal = new GameObject({
       x: x,
       y: y,
-      src: "/images/Green_Portal_.png", // img reference
+      src: "/images/smallPortal.png", // img reference
       behaviourLoop: [],
     });
     this.portal.id = `portal_${Date.now()}`;
@@ -341,8 +342,8 @@ window.OverworldMaps = {
   },
   lvl3: {
     mapId: "lvl3",
-    lowersrc: "/images/level-0001.png",
-    uppersrc: "/images/level0004-1.png",
+    lowersrc: "/images/level3_.png",
+    uppersrc: "/images/level3_1.png",
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,

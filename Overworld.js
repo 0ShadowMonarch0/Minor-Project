@@ -136,6 +136,7 @@ class Overworld {
         const hero = this.map.gameObjects.hero;
         const portal = this.map.portal;
         if (!hero || !portal) {
+          console.log("Hero or portal is null. Exiting.");
           return;
         }
 
@@ -165,10 +166,15 @@ class Overworld {
           console.log("Hero Position: X=", hero.x, " Y=", hero.y);
           console.log("Portal Position: X=", portal.x, " Y=", portal.y);
 
-          if (hero.x === portal.x && hero.y === portal.y) {
+          //ADD THIS
+          const heroGridX = hero.x;
+          const heroGridY = hero.y;
+          const portalGridX = portal.x;
+          const portalGridY = portal.y;
+          if (heroGridX === portalGridX && heroGridY === portalGridY) {
             if (this.mapId === "lvl1") {
               this.transitionTo("lvl2");
-            } else if (this.map.mapId === "lvl2") {
+            } else {
               this.transitionTo("lvl3");
             }
           }
@@ -183,6 +189,7 @@ class Overworld {
 
   //map transition
   transitionTo(mapId) {
+    console.log("Transitioning to level:", mapId); // Debugging
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId); // Stop previous loop
       this.animationFrameId = null; // Reset frame ID
@@ -201,6 +208,7 @@ class Overworld {
     //Create new Board
     const newMap = new OverworldMap(window.OverworldMaps[mapId]);
     this.map = newMap;
+    this.mapId = mapId;
 
     if (this.map.gameObjects.hero) {
       this.map.gameObjects.hero.isPlayerControlled = true;
@@ -224,6 +232,15 @@ class Overworld {
     this.startGameloop();
   }
 
+  startNextLevelCutscene() {
+    this.map.startCutscene([
+      { who: "hero", type: "walk", direction: "down" },
+      { who: "hero", type: "walk", direction: "down" },
+      { who: "hero", type: "walk", direction: "down" },
+      { who: "hero", type: "walk", direction: "down" },
+    ]);
+  }
+
   init() {
     this.mapId = "lvl1";
     this.map = new OverworldMap(window.OverworldMaps[this.mapId]);
@@ -238,6 +255,7 @@ class Overworld {
     this.map.startEnemySpawning("lvl1");
 
     this.startGameloop();
+    this.startNextLevelCutscene();
 
     this.map.startCutscene([
       { who: "hero", type: "walk", direction: "down" },

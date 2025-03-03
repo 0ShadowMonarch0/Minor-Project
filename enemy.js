@@ -22,6 +22,7 @@ class Enemy extends GameObject {
     this.health = this.maxHealth;
 
     this.startRandomDirection();
+    console.log("Enemy created with config:", config);
   }
 
   startRandomDirection() {
