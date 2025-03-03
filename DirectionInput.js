@@ -53,30 +53,33 @@ class DirectionInput {
   }
   //newly added end
 
-  init() {
-    //newly added
-    this.startRandomDirection();
-    //newly added end
+  stop() {
+    document.removeEventListener("keydown", this.keydownListener);
+    document.removeEventListener("keyup", this.keyupListener);
+  }
 
-    document.addEventListener("keydown", (e) => {
-      //newly added
-      this.isPlayerControlled = true;
-      //newly added end
+  init() {
+    this.startRandomDirection();
+
+    this.keydownListener = (e) => {
+      this.isPlayerControl = true;
       const dir = this.map[e.code];
-      if (dir && this.heldDirections.indexOf(dir) == -1) {
+      if (dir) {
+        this.heldDirections = [];
         this.heldDirections.unshift(dir);
       }
-    });
+    };
 
-    document.addEventListener("keyup", (e) => {
-      //newly added
-      this.isPlayerControlled = false;
-      //newly added end
+    this.keyupListener = (e) => {
+      this.isPlayerControl = false;
       const dir = this.map[e.code];
       const index = this.heldDirections.indexOf(dir);
       if (index > -1) {
         this.heldDirections.splice(index, 1);
       }
-    });
+    };
+
+    document.addEventListener("keydown", this.keydownListener);
+    document.addEventListener("keyup", this.keyupListener);
   }
 }

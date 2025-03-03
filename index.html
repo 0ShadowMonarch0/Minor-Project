@@ -5,20 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/style.css" />
     <title>Document</title>
+
+    <style>
+      /* Style the UI elements */
+      .ui-container {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        font-family: sans-serif;
+      }
+
+      .health-bar,
+      .stamina-bar {
+        width: 100px;
+        height: 10px;
+        background-color: gray;
+        margin-bottom: 5px;
+      }
+
+      .health-level,
+      .stamina-level {
+        height: 10px;
+        background-color: green;
+      }
+    </style>
   </head>
   <body>
     <div class="game-container">
       <canvas class="game-canvas" width="352" height="198"> </canvas>
     </div>
 
+    <!-- UI Container -->
+    <div class="ui-container">
+      <div class="health">
+        Health:
+        <div class="health-bar"><div class="health-level"></div></div>
+      </div>
+      <div class="stamina">
+        Stamina:
+        <div class="stamina-bar"><div class="stamina-level"></div></div>
+      </div>
+    </div>
+
     <!--Scripts-->
     <script src="/utils.js"></script>
-    <!--<-script src="/DirectionInput.js"></script>-->
+    <!-- <script src="/DirectionInput.js"></script> -->
     <script src="randDirection.js"></script>
     <script src="/Overworld.js"></script>
     <script src="/GameObject.js"></script>
     <script src="/Person.js"></script>
     <script src="/Sprite.js"></script>
+    <script src="enemy.js"></script>
+    <script src="/EnemyConfig.js"></script>
     <script src="/OverworldMap.js"></script>
     <script src="/OverworldEvent.js"></script>
 

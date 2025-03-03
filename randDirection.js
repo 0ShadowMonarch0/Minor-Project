@@ -32,6 +32,7 @@ class DirectionInput {
 
   stopRandomDirection() {
     clearInterval(this.randomDirectionInterval);
+    console.log("Stopping Direction listener!")
   }
 
   randomizeDirection() {
@@ -53,7 +54,7 @@ class DirectionInput {
   init() {
     this.startRandomDirection();
 
-    document.addEventListener("keydown", (e) => {
+    this.keydownListener = (e) => {
       const dir = this.map[e.code];
       if (dir) {
         this.isKeyDown = true;
@@ -61,15 +62,23 @@ class DirectionInput {
         this.heldDirections = [];
         this.heldDirections.unshift(dir);
       }
-    });
+    };
 
-    document.addEventListener("keyup", (e) => {
+    this.keyupListener = (e) => {
       const dir = this.map[e.code];
       if (dir && this.currentPressedDirection === dir) {
         this.isKeyDown = false;
         this.currentPressedDirection = null;
         this.heldDirections = [];
       }
-    });
+    };
+
+    document.addEventListener("keydown", this.keydownListener);
+    document.addEventListener("keyup", this.keyupListener);
+  }
+
+  stop() {
+    document.removeEventListener("keydown", this.keydownListener);
+    document.removeEventListener("keyup", this.keyupListener);
   }
 }
