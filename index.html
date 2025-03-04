@@ -29,33 +29,6 @@
         height: 10px;
         background-color: green;
       }
-
-      /* Game Over Screen Styles */
-      .game-over-screen {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(
-          0,
-          0,
-          0,
-          0.8
-        ); /* Dark semi-transparent background */
-        color: white;
-        display: none; /* Hidden by default */
-        justify-content: center;
-        align-items: center;
-        font-family: sans-serif;
-        font-size: 2em;
-        text-align: center;
-        z-index: 10; /* Ensure it's on top */
-      }
-
-      .game-over-screen.active {
-        display: flex; /* Show the screen when active */
-      }
     </style>
   </head>
   <body>
@@ -74,6 +47,9 @@
         <div class="stamina-bar"><div class="stamina-level"></div></div>
       </div>
     </div>
+    <div class="start-screen active">
+      <button id="start-button">Start Game</button>
+    </div>
     <!-- Game Over Screen -->
     <div class="game-over-screen">Game Over</div>
 
@@ -89,7 +65,7 @@
     <script src="/EnemyConfig.js"></script>
     <script src="/OverworldMap.js"></script>
     <script src="/OverworldEvent.js"></script>
-
+    <script src="story.js"></script>
     <script src="/init.js"></script>
   </body>
 </html>

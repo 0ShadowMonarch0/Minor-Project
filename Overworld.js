@@ -11,6 +11,16 @@ class Overworld {
     this.animationFrameId = null; // Track animation frame
     this.gameLoopActive = false; // Flag to control game loop
     //  this.gameSpeed = 60; // New property to control game speed (frames per second)
+    // 🔴 Add background music
+    this.backgroundMusic = new Audio(
+      "/music/Warriyo - Mortals (feat. Laura Brehm)  Future Trap  NCS - Copyright Free Music.mp3"
+    ); // Or .ogg
+    this.backgroundMusic.loop = true;
+
+    this.storyText = [];
+    this.storyIndex = 0;
+    this.storyTimer = null;
+    this._this = this;
   }
 
   updateHeroUI() {
@@ -25,6 +35,110 @@ class Overworld {
     document.querySelector(".stamina-level").style.width = `${staminaPercent}%`;
   }
 
+  // Start the story sequence
+  startStorySequence(storyArray, callback) {
+    if (this.isStoryActive) {
+      console.warn("Attempting to start a story while one is already active!");
+      return; // Don't start a new story
+    }
+    this.storyText = storyArray;
+    this.storyIndex = 0;
+    this.isStoryActive = true;
+    this.gameLoopActive = false; // Pause game loop
+    cancelAnimationFrame(this.animationFrameId); // 🔴 PREVENT RESTARTING LEVEL
+    this.storyCallback = callback; // Save callback
+
+    this.drawStoryText();
+    // 🔴 Pause music
+    this.backgroundMusic.pause();
+    this.storyTimer = setInterval(() => {
+      this.storyIndex++;
+      if (this.storyIndex >= this.storyText.length) {
+        this.stopStorySequence();
+      } else {
+        this.drawStoryText();
+      }
+    }, 3000); // Adjust timing as needed
+  }
+
+  // Stop the story sequence
+  stopStorySequence() {
+    clearInterval(this.storyTimer);
+    this.storyTimer = null;
+    this.storyText = [];
+    this.storyIndex = 0;
+    this.isStoryActive = false;
+
+    if (this.mapId === "lvl3") {
+      console.log("Game Completed! Showing completion screen.");
+      this.showGameOverScreen(); // Make sure this function exists in Overworld.js
+      return;
+    }
+
+    this.gameLoopActive = true; // Resume game loop
+    this.startGameloop();
+
+    if (this.storyCallback) {
+      this.storyCallback(); // Execute the callback
+      this.storyCallback = null;
+    }
+
+    // 🔴 Resume music
+    this.backgroundMusic.play();
+  }
+
+  // Draw the story text on the canvas
+  drawStoryText() {
+    if (!this.isStoryActive) return;
+
+    //clear off the canvas
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.fillStyle = "black";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.fillStyle = "white";
+    this.ctx.font = "16px monospace";
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    // Define max width for text wrapping
+    const maxWidth = this.canvas.width * 0.8; // 80% of canvas width
+    const lineHeight = 24; // Space between lines
+    const x = this.canvas.width / 2; // Center horizontally
+    const y = this.canvas.height / 2; // Start at center
+
+    // 🔴 Word-wrap the text to fit inside the canvas
+    const wrappedText = this.wrapText(
+      this.storyText[this.storyIndex],
+      maxWidth
+    );
+
+    // Draw each line of wrapped text
+    wrappedText.forEach((line, i) => {
+      this.ctx.fillText(line, x, y + i * lineHeight);
+    });
+  }
+
+  wrapText(text, maxWidth) {
+    const words = text.split(" ");
+    let lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const testLine = currentLine + " " + words[i];
+      const testWidth = this.ctx.measureText(testLine).width;
+
+      if (testWidth < maxWidth) {
+        currentLine = testLine;
+      } else {
+        lines.push(currentLine);
+        currentLine = words[i];
+      }
+    }
+    lines.push(currentLine);
+    return lines;
+  }
+
   //gameloop
   startGameloop() {
     if (this.animationFrameId) {
@@ -35,9 +149,11 @@ class Overworld {
 
     const step = () => {
       if (!this.gameLoopActive) return; // Prevent duplicate loops
-
+      if (this.isStoryActive) return;
       //clear off the canvas
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.fillStyle = "#7C0000"; // Set background color to red
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // Fill the canvas
 
       //Establish the Camera person
       const cameraPerson = this.map.gameObjects.hero;
@@ -138,16 +254,8 @@ class Overworld {
         const hero = this.map.gameObjects.hero;
         const portal = this.map.portal;
         if (!hero || !portal) {
-          console.log("Hero or portal is null. Exiting.");
           return;
         }
-
-        console.log(
-          "PersonWalkingComplete Event - Hero Position: X=",
-          hero.x,
-          " Y=",
-          hero.y
-        );
 
         //Did position change?
         if (
@@ -165,21 +273,52 @@ class Overworld {
         this.oldHeroPosition = null;
         //Is going to touch the portal
         if (portal && hero) {
-          console.log("Hero Position: X=", hero.x, " Y=", hero.y);
-          console.log("Portal Position: X=", portal.x, " Y=", portal.y);
-
           //ADD THIS
           const heroGridX = hero.x;
           const heroGridY = hero.y;
           const portalGridX = portal.x;
           const portalGridY = portal.y;
           if (heroGridX === portalGridX && heroGridY === portalGridY) {
-            if (this.mapId === "lvl1") {
-              this.transitionTo("lvl2");
-            } else {
-              this.transitionTo("lvl3");
+            if (this.mapId === "lvl3" && this.map.levelComplete) {
+              // ✅ CHECK IF LEVEL IS COMPLETE
+              console.log(
+                "🎉 Hero completed Level 3! Running completion sequence..."
+              );
+
+              // 🔴 Stop game loop immediately
+              this.gameLoopActive = false;
+              cancelAnimationFrame(this.animationFrameId);
+
+              // 🔴 Clear the canvas to prevent flickering
+              this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+              // 🔴 Add a short delay (optional) for a smooth effect
+              setTimeout(() => {
+                this.startStorySequence(completionStory, null);
+              }, 100); // Small delay to smooth transition
+              return;
             }
+            if (this.mapId === "lvl1") {
+              console.log(
+                "Hero touching portal in lvl1. Transitioning to lvl2."
+              );
+              this.transitionTo("lvl2");
+              return;
+            }
+            if (this.mapId === "lvl2") {
+              console.log(
+                "Hero touching portal in lvl2. Transitioning to lvl3."
+              );
+              this.transitionTo("lvl3");
+              return;
+            }
+          } else {
+            console.log("Hero is NOT touching the portal.");
           }
+        } else {
+          console.log(
+            "PersonWalkingComplete event received, but not for hero."
+          );
         }
       }
     };
@@ -234,6 +373,11 @@ class Overworld {
     this.startGameloop();
   }
 
+  stopGameLoop() {
+    this.gameLoopActive = false; // Set the flag to stop the game loop
+    cancelAnimationFrame(this.animationFrameId); // Cancel the animation frame
+  }
+
   startNextLevelCutscene() {
     this.map.startCutscene([
       { who: "hero", type: "walk", direction: "down" },
@@ -243,14 +387,11 @@ class Overworld {
     ]);
   }
 
-  stopGameLoop() {
-    this.gameLoopActive = false; // Set the flag to stop the game loop
-    cancelAnimationFrame(this.animationFrameId); // Cancel the animation frame
-  }
-
   showGameOverScreen() {
     const gameOverScreen = document.querySelector(".game-over-screen");
     gameOverScreen.classList.add("active");
+    this.backgroundMusic.pause(); // 🔴 pause the music
+    this.backgroundMusic.currentTime = 0; // set play time to beginning
   }
 
   init() {
@@ -267,7 +408,10 @@ class Overworld {
     this.map.startEnemySpawning("lvl1");
 
     this.startGameloop();
-    this.startNextLevelCutscene();
+    const callback = () => {
+      this.startNextLevelCutscene();
+    };
+    this.startStorySequence(startStory, callback);
 
     this.map.startCutscene([
       { who: "hero", type: "walk", direction: "down" },
@@ -279,5 +423,7 @@ class Overworld {
       { who: "npcB", type: "walk", direction: "left" },
       { who: "npcB", type: "stand", direction: "up", time: 800 },
     ]);
+    // 🔴 Start playing the background music
+    this.backgroundMusic.play();
   }
 }

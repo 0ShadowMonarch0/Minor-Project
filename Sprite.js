@@ -104,6 +104,8 @@ class Sprite {
 
     const [frameX, frameY] = this.frame;
 
+    // Flicker effect: Only draw the sprite if not taking damage or if the flicker allows it
+  if (!this.gameObject.isTakingDamage || Math.floor(Date.now() / 100) % 2) { // Flicker logic
     this.isloaded &&
       ctx.drawImage(
         this.image,
@@ -116,6 +118,7 @@ class Sprite {
         this.frameSize.x,
         this.frameSize.y
       ); //cutting the sprite and drawing on the map
+  }
     this.updateAnimationProgress();
 
     if (this.gameObject instanceof Enemy) {

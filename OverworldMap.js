@@ -15,6 +15,8 @@ class OverworldMap {
     this.maxEnemies = config.maxEnemies || 3; // limit to 15 enemies at a time 🔴 Changed here
     this.enemiesDefeated = 0; // New variable
     this.portal = null; // New variable to reference portal
+    this.completionCallback = config.completionCallback; // Added: Callback for when the level is complete
+    //this.game = game;
   }
 
   drawLowerImage(ctx, cameraPerson) {
@@ -128,6 +130,7 @@ class OverworldMap {
       src: enemyConfig.src,
       speed: enemyConfig.speed, //Slower Speed
       maxHealth: enemyConfig.maxHealth,
+      damage: enemyConfig.damage,
       frameSize: enemyConfig.frameSize,
     });
 
@@ -151,6 +154,8 @@ class OverworldMap {
     if (this.enemiesDefeated >= this.maxEnemies && !this.portal) {
       this.stopEnemySpawning();
       this.spawnPortal();
+      this.levelComplete = true; // 🔴 ADD THIS FLAG
+      console.log("✅ Level 3 complete! Portal spawned.");
     }
   }
   spawnPortal() {
@@ -159,7 +164,7 @@ class OverworldMap {
     this.portal = new GameObject({
       x: x,
       y: y,
-      src: "/images/smallPortal.png", // img reference
+      src: "/images/fportal.png", // img reference
       behaviourLoop: [],
     });
     this.portal.id = `portal_${Date.now()}`;
@@ -193,12 +198,16 @@ class OverworldMap {
 
   moveWall(wasX, wasY, direction) {
     if (this.isCutscenePlaying || !this.gameObjects?.hero) {
+      console.log(
+        "trying to move wall while cutscene is active or hero doesnt exist"
+      );
       return;
     }
 
     this.removeWall(wasX, wasY);
     const { x, y } = utils.nextPosition(wasX, wasY, direction);
     this.addWall(x, y);
+    console.log("moved wall");
   }
 
   unmountObjects() {
@@ -287,7 +296,7 @@ window.OverworldMaps = {
 
   lvl2: {
     mapId: "lvl2",
-    lowersrc: "/images/sprite-0004.png",
+    lowersrc: "/images/level2.png",
     uppersrc: "/images/level0004-1.png",
     maxEnemies: 5,
     gameObjects: {
@@ -349,7 +358,7 @@ window.OverworldMaps = {
   },
   lvl3: {
     mapId: "lvl3",
-    lowersrc: "/images/level3_.png",
+    lowersrc: "/images/level3.png",
     uppersrc: "/images/level3_1.png",
     maxEnemies: 2,
     gameObjects: {
@@ -360,6 +369,18 @@ window.OverworldMaps = {
         maxHealth: 100,
         maxStamina: 100,
       }),
+    },
+    completionCallback: function () {
+      console.log("🎉 Level 3 completed. Running final sequence.");
+
+      // Use the existing Overworld instance instead of creating a new one
+      const overworld = window.currentOverworldInstance; // ✅ Store the existing instance globally
+      if (!overworld) {
+        console.error("❌ Overworld instance not found!");
+        return;
+      }
+
+      overworld.startStorySequence(completionStory, null);
     },
   },
 };

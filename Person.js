@@ -19,6 +19,7 @@ class Person extends GameObject {
     this.stamina = this.maxStamina;
     this.staminaRegenRate = config.staminaRegenRate || 0.5; // Stamina Regen Per Step
     this.enemyDamageCooldowns = {}; // Store individual enemy cooldowns
+    this.isTakingDamage = false; // New flag
   }
 
   recoverStamina() {
@@ -67,7 +68,7 @@ class Person extends GameObject {
         );
         if (distance <= attackRange) {
           console.log("Enemy hit!", enemy);
-          enemy.takeDamage(10 , state);
+          enemy.takeDamage(10, state);
           this.pushBackEnemy(enemy, attackDirection, state.map);
         }
       });
@@ -121,8 +122,8 @@ class Person extends GameObject {
         // Check if the enemy has a cooldown active
         if (!this.enemyDamageCooldowns[enemy.id]) {
           // No cooldown, so take damage and start the cooldown
-          this.takeDamage(10 , state);
-          enemy.stopMovingForDuration(5000);
+          this.takeDamage(enemy.damage, state);
+          enemy.stopMovingForDuration(3000);
           this.enemyDamageCooldowns[enemy.id] = true; // Start cooldown
           setTimeout(() => {
             // Reset cooldown after 5 seconds
@@ -141,6 +142,12 @@ class Person extends GameObject {
       "Current health:",
       this.health
     );
+
+    this.isTakingDamage = true; // Set the flag
+    setTimeout(() => {
+      this.isTakingDamage = false; // Reset the flag
+    }, 200); // Flicker duration (adjust as needed)
+
     if (this.health <= 0) {
       this.health = 0;
 
