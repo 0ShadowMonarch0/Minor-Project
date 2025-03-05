@@ -21,6 +21,8 @@ class Overworld {
     this.storyIndex = 0;
     this.storyTimer = null;
     this._this = this;
+
+    this.isGameActive = false; // ✅ Flag to track active gameplay
   }
 
   updateHeroUI() {
@@ -41,6 +43,7 @@ class Overworld {
       console.warn("Attempting to start a story while one is already active!");
       return; // Don't start a new story
     }
+    this.isGameActive = false; // ⛔ Stop gameplay-related logic
     this.storyText = storyArray;
     this.storyIndex = 0;
     this.isStoryActive = true;
@@ -75,6 +78,7 @@ class Overworld {
       return;
     }
 
+    this.isGameActive = true; // ✅ Resume gameplay logic
     this.gameLoopActive = true; // Resume game loop
     this.startGameloop();
 
@@ -390,6 +394,7 @@ class Overworld {
   showGameOverScreen() {
     const gameOverScreen = document.querySelector(".game-over-screen");
     gameOverScreen.classList.add("active");
+    this.isGameActive = false; // ⛔ Completely stop gameplay
     this.backgroundMusic.pause(); // 🔴 pause the music
     this.backgroundMusic.currentTime = 0; // set play time to beginning
   }

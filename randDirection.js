@@ -1,7 +1,7 @@
 class DirectionInput {
   constructor() {
     this.heldDirections = [];
-    this.map = {
+    this.defaultMap = {
       ArrowUp: "up",
       KeyW: "up",
       ArrowDown: "down",
@@ -11,48 +11,61 @@ class DirectionInput {
       ArrowRight: "right",
       KeyD: "right",
     };
-    this.randomDirectionInterval = null;
-    this.randomizeDirection = this.randomizeDirection.bind(this);
-    this.lastRandom = null;
-    this.currentPressedDirection = null;
+    this.map = { ...this.defaultMap };
     this.isKeyDown = false;
+    this.currentPressedDirection = null;
+    this.randomizationInterval = null;
+
+    this.controlUI = new ControlUI(); // Use ControlUI
+
+    this.controlUI.updateControlsDisplay(this.map); // Initial UI update
   }
 
   get direction() {
     return this.heldDirections[0] || null;
   }
 
-  startRandomDirection() {
-    this.randomDirectionInterval = setInterval(() => {
-      if (this.isKeyDown) {
-        this.randomizeDirection();
-      }
-    }, 5000);
-  }
-
-  stopRandomDirection() {
-    clearInterval(this.randomDirectionInterval);
-    console.log("Stopping Direction listener!")
-  }
-
-  randomizeDirection() {
+  shuffleControls() {
     const directions = ["up", "down", "left", "right"];
-    let randomIndex;
 
-    do {
-      randomIndex = Math.floor(Math.random() * 4);
-    } while (randomIndex === this.lastRandom);
+    // Shuffle directions while ensuring no duplicates
+    let shuffledDirections = [...directions].sort(() => Math.random() - 0.5);
 
-    this.lastRandom = randomIndex;
+    // Assign shuffled values to WASD
+    this.map.KeyW = shuffledDirections[0];
+    this.map.KeyA = shuffledDirections[1];
+    this.map.KeyS = shuffledDirections[2];
+    this.map.KeyD = shuffledDirections[3];
 
-    if (this.currentPressedDirection) {
-      this.heldDirections = [];
-      this.heldDirections.unshift(directions[randomIndex]);
-    }
+    // Mirror the WASD mapping to Arrow keys
+    this.map.ArrowUp = this.map.KeyW;
+    this.map.ArrowLeft = this.map.KeyA;
+    this.map.ArrowDown = this.map.KeyS;
+    this.map.ArrowRight = this.map.KeyD;
+
+    console.log("New randomized controls:", this.map);
+
+    // UI Updates
+    this.controlUI.updateControlsDisplay(this.map);
+    this.controlUI.showShuffleMessage();
+    this.controlUI.playShuffleSound();
+  }
+
+  startRandomizingControls() {
+    this.shuffleControls(); // Shuffle immediately
+    this.randomizationInterval = setInterval(() => {
+      this.shuffleControls();
+    }, 10000); // Shuffle every 10 seconds
+  }
+
+  stopRandomizingControls() {
+    clearInterval(this.randomizationInterval);
+    this.map = { ...this.defaultMap }; // Reset to default controls
+    console.log("Controls reset to default.");
   }
 
   init() {
-    this.startRandomDirection();
+    this.startRandomizingControls(); // Start control randomization
 
     this.keydownListener = (e) => {
       const dir = this.map[e.code];
@@ -80,5 +93,6 @@ class DirectionInput {
   stop() {
     document.removeEventListener("keydown", this.keydownListener);
     document.removeEventListener("keyup", this.keyupListener);
+    this.stopRandomizingControls();
   }
 }
