@@ -55,7 +55,7 @@ class DirectionInput {
     this.shuffleControls(); // Shuffle immediately
     this.randomizationInterval = setInterval(() => {
       this.shuffleControls();
-    }, 10000); // Shuffle every 10 seconds
+    }, 15000); // Shuffle every 15 seconds
   }
 
   stopRandomizingControls() {

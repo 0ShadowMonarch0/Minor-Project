@@ -44,6 +44,10 @@ class Overworld {
       return; // Don't start a new story
     }
     this.isGameActive = false; // ⛔ Stop gameplay-related logic
+    this.directionInput.stop(); // 🔴 Stop direction input during story
+    this.bindActionInput(false); // 🔴 Disable action input during story
+    this.bindHeroPositionCheck(false); // 🔴 Disable position check during story
+
     this.storyText = storyArray;
     this.storyIndex = 0;
     this.isStoryActive = true;
@@ -80,6 +84,10 @@ class Overworld {
 
     this.isGameActive = true; // ✅ Resume gameplay logic
     this.gameLoopActive = true; // Resume game loop
+    this.directionInput.init(); // 🔴 Resume direction input after story
+    this.bindActionInput(true); // 🔴 Enable action input after story
+    this.bindHeroPositionCheck(true); // 🔴 Enable position check after story
+
     this.startGameloop();
 
     if (this.storyCallback) {
@@ -405,7 +413,8 @@ class Overworld {
     this.map.mountObjects();
 
     this.directionInput = new DirectionInput();
-    this.directionInput.init();
+    //   this.directionInput.init();
+    this.directionInput.stop(); //🛑🛑🛑🛑🛑STOP THE RANDMOZATION
     this.bindActionInput();
     this.bindHeroPositionCheck();
 

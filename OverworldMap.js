@@ -270,26 +270,17 @@ window.OverworldMaps = {
     },
     walls: (() => {
       const walls = {};
-      for (let y = 2; y <= 15; y++) {
-        walls[utils.asGridCoord(0, y)] = true;
-        walls[utils.asGridCoord(39, y)] = true;
+      for (let y = 6; y <= 8; y++) {
+        walls[utils.asGridCoord(16, y)] = true;
+        walls[utils.asGridCoord(23, y)] = true;
       }
-      for (let x = 0; x <= 39; x++) {
-        walls[utils.asGridCoord(x, 1)] = true;
-        walls[utils.asGridCoord(x, 15)] = true;
-        if (x >= 32) {
-          walls[utils.asGridCoord(x, 2)] = true;
-        }
+      for (let x = 16; x <= 23; x++) {
+        walls[utils.asGridCoord(x, 5)] = true;
+        walls[utils.asGridCoord(x, 9)] = true;
+        //   if (x >= 32) {
+        //     walls[utils.asGridCoord(x, 2)] = true;
+        //   }
       }
-      // Add other individual walls
-      walls[utils.asGridCoord(14, 9)] = true;
-      walls[utils.asGridCoord(15, 8)] = true;
-      walls[utils.asGridCoord(16, 7)] = true;
-      walls[utils.asGridCoord(17, 6)] = true;
-      walls[utils.asGridCoord(18, 6)] = true;
-      walls[utils.asGridCoord(19, 6)] = true;
-      walls[utils.asGridCoord(20, 6)] = true;
-
       return walls;
     })(),
   },
@@ -333,26 +324,14 @@ window.OverworldMaps = {
     },
     walls: (() => {
       const walls = {};
-      for (let y = 2; y <= 15; y++) {
-        walls[utils.asGridCoord(0, y)] = true;
-        walls[utils.asGridCoord(39, y)] = true;
+      for (let y = 6; y <= 10; y++) {
+        walls[utils.asGridCoord(10, y)] = true;
+        walls[utils.asGridCoord(13, y)] = true;
       }
-      for (let x = 0; x <= 39; x++) {
-        walls[utils.asGridCoord(x, 1)] = true;
-        walls[utils.asGridCoord(x, 15)] = true;
-        if (x >= 32) {
-          walls[utils.asGridCoord(x, 2)] = true;
-        }
+      for (let x = 10; x <= 13; x++) {
+        walls[utils.asGridCoord(x, 7)] = true;
+        walls[utils.asGridCoord(x, 10)] = true;
       }
-      // Add other individual walls
-      walls[utils.asGridCoord(14, 9)] = true;
-      walls[utils.asGridCoord(15, 8)] = true;
-      walls[utils.asGridCoord(16, 7)] = true;
-      walls[utils.asGridCoord(17, 6)] = true;
-      walls[utils.asGridCoord(18, 6)] = true;
-      walls[utils.asGridCoord(19, 6)] = true;
-      walls[utils.asGridCoord(20, 6)] = true;
-
       return walls;
     })(),
   },
@@ -370,6 +349,18 @@ window.OverworldMaps = {
         maxStamina: 100,
       }),
     },
+    walls: (() => {
+      const walls = {};
+      for (let y = 5; y <= 10; y++) {
+        walls[utils.asGridCoord(13, y)] = true;
+        walls[utils.asGridCoord(23, y)] = true;
+      }
+      for (let x = 13; x <= 23; x++) {
+        walls[utils.asGridCoord(x, 5)] = true;
+        walls[utils.asGridCoord(x, 10)] = true;
+      }
+      return walls;
+    })(),
     completionCallback: function () {
       console.log("🎉 Level 3 completed. Running final sequence.");
 
