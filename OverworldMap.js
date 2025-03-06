@@ -244,29 +244,6 @@ window.OverworldMaps = {
         maxHealth: 100,
         maxStamina: 100,
       }),
-      npcA: new Person({
-        x: utils.withGrid(6),
-        y: utils.withGrid(10),
-        src: "/images/prince.png",
-        behaviourLoop: [
-          { type: "stand", direction: "up", time: 800 },
-          { type: "stand", direction: "left", time: 500 },
-          { type: "stand", direction: "down", time: 600 },
-          { type: "stand", direction: "right", time: 300 },
-        ],
-      }),
-      npcB: new Person({
-        x: utils.withGrid(10),
-        y: utils.withGrid(8),
-        src: "/images/santa.png",
-        behaviourLoop: [
-          { type: "walk", direction: "left" },
-          { type: "stand", direction: "down", time: 800 },
-          { type: "walk", direction: "down" },
-          { type: "walk", direction: "right" },
-          { type: "walk", direction: "up" },
-        ],
-      }),
     },
     walls: (() => {
       const walls = {};
@@ -297,29 +274,6 @@ window.OverworldMaps = {
         y: utils.withGrid(6),
         maxHealth: 100,
         maxStamina: 100,
-      }),
-      npcA: new Person({
-        x: utils.withGrid(6),
-        y: utils.withGrid(10),
-        src: "/images/prince.png",
-        behaviourLoop: [
-          { type: "stand", direction: "up", time: 800 },
-          { type: "stand", direction: "left", time: 500 },
-          { type: "stand", direction: "down", time: 600 },
-          { type: "stand", direction: "right", time: 300 },
-        ],
-      }),
-      npcB: new Person({
-        x: utils.withGrid(10),
-        y: utils.withGrid(8),
-        src: "/images/santa.png",
-        behaviourLoop: [
-          { type: "walk", direction: "left" },
-          { type: "stand", direction: "down", time: 800 },
-          { type: "walk", direction: "down" },
-          { type: "walk", direction: "right" },
-          { type: "walk", direction: "up" },
-        ],
       }),
     },
     walls: (() => {

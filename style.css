@@ -3,10 +3,14 @@
 }
 
 body{
-  background-color: rgb(167, 121, 121);
+  /* background-color: rgb(167, 121, 121); */
   padding: 0;
   margin: 0;
   overflow: hidden;
+  background-image: url("/images/moon.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+
 }
 
 .game-container{
@@ -14,7 +18,7 @@ body{
   width: 352px;
   height: 198px;
   margin: 0 auto;
-  outline: solid rgb(150, 11, 11);
+  outline: solid rgba(28, 40, 46, 0.649);
 
   transform: scale(2) translateY(50%);
 
@@ -35,7 +39,9 @@ body{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: white;
+  /* background-image: url("/images/holloweenmap.png"); */
+  background-image: url("/images/holloweenmap.png");
+  background-size: cover;
   font-size: 2em;
   text-align: center;
   z-index: 100; /* Ensure it's on top */
@@ -53,6 +59,8 @@ body{
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
+  border-radius: 20px;
+  background-color: rgb(206, 50, 50)
 }
 .game-over-screen {
   position: absolute;
@@ -76,8 +84,32 @@ body{
 }
 
 
-#controlDisplay {
+ /* Style the UI elements */
+.ui-container {
   position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  font-family: sans-serif;
+}
+
+.health-bar,
+.stamina-bar {
+  width: 100px;
+  height: 10px;
+  background-color: gray;
+  margin-bottom: 5px;
+}
+
+.health-level,
+.stamina-level {
+  height: 10px;
+  background-color: green;
+}
+
+
+#controlDisplay {
+  position: fixed;
   top:55%;
   right: 15%;
   background: rgba(0, 0, 0, 0.7);
