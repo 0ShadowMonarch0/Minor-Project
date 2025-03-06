@@ -1,7 +1,7 @@
 const EnemyTypes = {
   lvl1: {
     type: "basic",
-    src: "/images/enemy2.png",
+    src: "/images/enemy1.png",
     speed: 0.65,
     maxHealth: 150,
     damage: 5, // Added damage property
