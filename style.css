@@ -87,8 +87,8 @@ body{
  /* Style the UI elements */
 .ui-container {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 15%;
+  left: 20%;
   color: white;
   font-family: sans-serif;
 }
