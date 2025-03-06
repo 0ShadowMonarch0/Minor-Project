@@ -11,9 +11,26 @@ class Person extends GameObject {
       left: ["x", -1],
       right: ["x", 1],
     };
+    this.isAttacking = false;
+
+    this.maxHealth = config.maxHealth || 100; // Hero's Maximum Health
+    this.health = this.maxHealth;
+    this.maxStamina = config.maxStamina || 100;
+    this.stamina = this.maxStamina;
+    this.staminaRegenRate = config.staminaRegenRate || 0.5; // Stamina Regen Per Step
+    this.enemyDamageCooldowns = {}; // Store individual enemy cooldowns
+    this.isTakingDamage = false; // New flag
+  }
+
+  recoverStamina() {
+    this.stamina = Math.min(
+      this.maxStamina,
+      this.stamina + this.staminaRegenRate
+    );
   }
 
   update(state) {
+    this.recoverStamina();
     if (this.movingProgressRemaining > 0) {
       this.updatePosition();
     } else {
@@ -33,6 +50,111 @@ class Person extends GameObject {
         });
       }
       this.updateSprite(state);
+    }
+    this.handleAttack(state);
+    this.checkEnemyCollisions(state);
+  }
+
+  handleAttack(state) {
+    if (this.isPlayerControlled && this.isAttacking && this.stamina >= 10) {
+      const attackDirection = this.direction; // Use current direction for attack
+      const attackRange = 24; // Reduced attack range
+      // const { x, y } = utils.nextPosition(this.x, this.y, attackDirection);
+      this.stamina -= 10;
+      // Perform attack
+      state.map.enemies.forEach((enemy) => {
+        const distance = Math.sqrt(
+          Math.pow(this.x - enemy.x, 2) + Math.pow(this.y - enemy.y, 2)
+        );
+        if (distance <= attackRange) {
+          console.log("Enemy hit!", enemy);
+          enemy.takeDamage(10, state);
+          this.pushBackEnemy(enemy, attackDirection, state.map);
+        }
+      });
+    }
+  }
+
+  pushBackEnemy(enemy, direction, map) {
+    const pushbackDistance = 100; // Adjust as needed
+    const [property, change] = enemy.directionUpdate[direction];
+
+    // Calculate the new enemy position
+    const newX =
+      enemy.x +
+      (direction === "left"
+        ? -pushbackDistance
+        : direction === "right"
+        ? pushbackDistance
+        : 0);
+    const newY =
+      enemy.y +
+      (direction === "up"
+        ? -pushbackDistance
+        : direction === "down"
+        ? pushbackDistance
+        : 0);
+    let canPush = false;
+
+    // Check if the new position is within map bounds and not a wall
+    if (
+      map.isWithinMapBounds(newX, newY) &&
+      !map.walls[`${newX},${newY}`] &&
+      !(map.gameObjects.hero.x === newX && map.gameObjects.hero.y === newY)
+    ) {
+      canPush = true;
+    }
+
+    if (canPush) {
+      console.log("Pushing enemy", enemy.id, "in direction", direction);
+      // Apply the pushback
+      enemy[property] += change;
+      enemy.movingProgressRemaining = pushbackDistance / enemy.speed;
+    }
+  }
+
+  checkEnemyCollisions(state) {
+    state.map.enemies.forEach((enemy) => {
+      const distance = Math.sqrt(
+        Math.pow(this.x - enemy.x, 2) + Math.pow(this.y - enemy.y, 2)
+      );
+      if (distance < 16) {
+        // Check if the enemy has a cooldown active
+        if (!this.enemyDamageCooldowns[enemy.id]) {
+          // No cooldown, so take damage and start the cooldown
+          this.takeDamage(enemy.damage, state);
+          enemy.stopMovingForDuration(3000);
+          this.enemyDamageCooldowns[enemy.id] = true; // Start cooldown
+          setTimeout(() => {
+            // Reset cooldown after 5 seconds
+            delete this.enemyDamageCooldowns[enemy.id];
+          }, 5000);
+        }
+      }
+    });
+  }
+
+  takeDamage(damageAmount, state) {
+    this.health -= damageAmount;
+    console.log(
+      "Hero taking damage:",
+      damageAmount,
+      "Current health:",
+      this.health
+    );
+
+    this.isTakingDamage = true; // Set the flag
+    setTimeout(() => {
+      this.isTakingDamage = false; // Reset the flag
+    }, 200); // Flicker duration (adjust as needed)
+
+    if (this.health <= 0) {
+      this.health = 0;
+
+      // Handle death/game over scenario here
+      state.overworld.stopGameLoop(); // Stop game loop via overworld instance
+      state.overworld.showGameOverScreen(); // Show game over screen
+      console.log("Game Over!");
     }
   }
 
@@ -86,6 +208,12 @@ class Person extends GameObject {
       this.sprite.setAnimation("walk-" + this.direction);
       return;
     }
+
+    if (this.isAttacking) {
+      this.sprite.setAnimation("attack-" + this.direction);
+      return;
+    }
+
     this.sprite.setAnimation("idle-" + this.direction);
   }
 }

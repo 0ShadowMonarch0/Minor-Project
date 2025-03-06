@@ -3,9 +3,15 @@ class Sprite {
     //set up image
     this.image = new Image();
     this.image.src = config.src;
+    this.image.onerror = () => {
+      console.error("Failed to load image:", config.src);
+    };
+
     this.image.onload = () => {
       this.isloaded = true;
     };
+
+    this.frameSize = config.frameSize || { x: 32, y: 32 };
 
     //shadow
     this.shadow = new Image();
@@ -25,28 +31,32 @@ class Sprite {
       "idle-up": [[0, 3]],
       "walk-down": [
         [1, 0],
-        [0, 0],
+        [2, 0],
         [3, 0],
         [0, 0],
       ],
       "walk-left": [
         [1, 1],
-        [0, 1],
+        [2, 1],
         [3, 1],
         [0, 1],
       ],
       "walk-right": [
         [1, 2],
-        [0, 2],
+        [2, 2],
         [3, 2],
         [0, 2],
       ],
       "walk-up": [
         [1, 3],
-        [0, 3],
+        [2, 3],
         [3, 3],
         [0, 3],
       ],
+      "attack-down": [[2, 4]],
+      "attack-left": [[1, 5]],
+      "attack-right": [[1, 4]],
+      "attack-up": [[0, 4]],
     };
     this.currentAnimation = "walk-left"; //config.currentAnimation || "idle-down";
     this.currentAnimationFrame = 0;
@@ -94,8 +104,41 @@ class Sprite {
 
     const [frameX, frameY] = this.frame;
 
+    // Flicker effect: Only draw the sprite if not taking damage or if the flicker allows it
+  if (!this.gameObject.isTakingDamage || Math.floor(Date.now() / 100) % 2) { // Flicker logic
     this.isloaded &&
-      ctx.drawImage(this.image, frameX * 32, frameY * 48, 32, 48, x, y, 32, 32); //cutting the sprite and drawing on the map
+      ctx.drawImage(
+        this.image,
+        frameX * this.frameSize.x, // x coordinate on spritesheet
+        frameY * this.frameSize.y, // y coordinate on spritesheet
+        this.frameSize.x, // width of frame
+        this.frameSize.y, // height of frame
+        x,
+        y,
+        this.frameSize.x,
+        this.frameSize.y
+      ); //cutting the sprite and drawing on the map
+  }
     this.updateAnimationProgress();
+
+    if (this.gameObject instanceof Enemy) {
+      this.drawHealthBar(ctx, x, y, cameraPerson);
+    }
+  }
+
+  drawHealthBar(ctx, x, y, cameraPerson) {
+    const healthPercentage = this.gameObject.health / this.gameObject.maxHealth;
+    const barWidth = 32; // Health bar width
+    const barHeight = 4; // Health bar height
+    const barX = x;
+    const barY = y - 8; // Position above the sprite
+
+    // Draw the background (empty) health bar
+    ctx.fillStyle = "gray";
+    ctx.fillRect(barX, barY, barWidth, barHeight);
+
+    // Draw the filled health bar
+    ctx.fillStyle = "red";
+    ctx.fillRect(barX, barY, barWidth * healthPercentage, barHeight);
   }
 }
