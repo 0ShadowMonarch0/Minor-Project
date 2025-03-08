@@ -10,11 +10,10 @@ class Overworld {
     this.directionInput = new DirectionInput();
     this.animationFrameId = null; // Track animation frame
     this.gameLoopActive = false; // Flag to control game loop
-    //  this.gameSpeed = 60; // New property to control game speed (frames per second)
-    // 🔴 Add background music
+    // Add background music
     this.backgroundMusic = new Audio(
       "/music/Warriyo - Mortals (feat. Laura Brehm)  Future Trap  NCS - Copyright Free Music.mp3"
-    ); // Or .ogg
+    );
     this.backgroundMusic.loop = true;
 
     this.storyText = [];
@@ -23,6 +22,13 @@ class Overworld {
     this._this = this;
 
     this.isGameActive = false; // ✅ Flag to track active gameplay
+
+    this.levelBackgroundColors = {
+      lvl1: "#7C0000", // Dark Red (original)
+      lvl2: "#000033", // Dark Blue
+      lvl3: "#003300", // Dark Green
+      // Add more levels and colors as needed
+    };
   }
 
   updateHeroUI() {
@@ -65,7 +71,7 @@ class Overworld {
       } else {
         this.drawStoryText();
       }
-    }, 3000); // Adjust timing as needed
+    }, 2000); // Adjust timing as needed
   }
 
   // Stop the story sequence
@@ -164,7 +170,8 @@ class Overworld {
       if (this.isStoryActive) return;
       //clear off the canvas
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.fillStyle = "#7C0000"; // Set background color to red
+      // Use the dynamic background color
+      this.ctx.fillStyle = this.levelBackgroundColors[this.mapId] || "#000000"; // Default to black if not found
       this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // Fill the canvas
 
       //Establish the Camera person
@@ -414,7 +421,7 @@ class Overworld {
 
     this.directionInput = new DirectionInput();
     //   this.directionInput.init();
-    this.directionInput.stop(); //🛑🛑🛑🛑🛑STOP THE RANDMOZATION
+    this.directionInput.stop(); //STOP THE RANDMOZATION
     this.bindActionInput();
     this.bindHeroPositionCheck();
 
@@ -437,7 +444,7 @@ class Overworld {
       { who: "npcB", type: "walk", direction: "left" },
       { who: "npcB", type: "stand", direction: "up", time: 800 },
     ]);
-    // 🔴 Start playing the background music
+    //  Start playing the background music
     this.backgroundMusic.play();
   }
 }

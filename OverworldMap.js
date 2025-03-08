@@ -235,7 +235,7 @@ window.OverworldMaps = {
     mapId: "lvl1",
     lowersrc: "/images/final_level1.png",
     uppersrc: "/images/layer_1.png",
-    maxEnemies: 5,
+    maxEnemies: 7,
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
