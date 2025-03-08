@@ -264,7 +264,7 @@ window.OverworldMaps = {
 
   lvl2: {
     mapId: "lvl2",
-    lowersrc: "/images/level2.png",
+    lowersrc: "/images/final2.png",
     uppersrc: "/images/level0004-1.png",
     maxEnemies: 5,
     gameObjects: {
@@ -291,7 +291,7 @@ window.OverworldMaps = {
   },
   lvl3: {
     mapId: "lvl3",
-    lowersrc: "/images/level3.png",
+    lowersrc: "/images/final3.png",
     uppersrc: "/images/level3_1.png",
     maxEnemies: 2,
     gameObjects: {
