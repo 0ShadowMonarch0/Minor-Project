@@ -26,7 +26,7 @@ class Overworld {
     this.levelBackgroundColors = {
       lvl1: "#7C0000", // Dark Red (original)
       lvl2: "#95332C",
-      lvl3: "#972734",
+      lvl3: "#973724",
       // Add more levels and colors as needed
     };
   }
